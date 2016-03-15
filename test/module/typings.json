@@ -1,0 +1,6 @@
+{
+  "version": false,
+  "dependencies": {
+    "knockout": "file:../../typings.json"
+  }
+}
