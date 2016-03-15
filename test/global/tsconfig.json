@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "target": "es5"
+    },
+    "files": [
+        "typings/browser.d.ts",
+        "test.ts"
+    ]
+}
