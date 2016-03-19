@@ -2,6 +2,6 @@
   "version": false,
   "dependencies": {},
   "ambientDependencies": {
-    "knockout": "file:../../global.d.ts"
+    "knockout": "file:../../global/typings.json"
   }
 }
