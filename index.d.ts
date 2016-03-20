@@ -27,13 +27,14 @@ declare module ko {
         subscribe(callback: SubscriptionCallback<T>, callbackTarget: any): subscription<T>;
         subscribe(callback: SubscriptionCallback<T>, callbackTarget: any, event: string): subscription<T>;
         
+        extend(requestedExtenders: Object): this;
         extend<T extends Subscribable<any>>(requestedExtenders: Object): T;
         
         getSubscriptionsCount(): number;
         getSubscriptionsCount(event: string): number;
     }    
     
-    export abstract class subscribable<T> implements Subscribable<T> {
+    export class subscribable<T> implements Subscribable<T> {
         notifySubscribers(): void;
 	    notifySubscribers(valueToWrite: T): void;
 	    notifySubscribers(valueToWrite: T, event: string): void;
@@ -42,6 +43,7 @@ declare module ko {
         subscribe(callback: SubscriptionCallback<T>, callbackTarget: any): subscription<T>;
         subscribe(callback: SubscriptionCallback<T>, callbackTarget: any, event: string): subscription<T>;
         
+        extend(requestedExtenders: Object): this;
         extend<T extends Subscribable<any>>(requestedExtenders: Object): T;
         
         getSubscriptionsCount(): number;
@@ -152,7 +154,7 @@ declare module ko {
     
     //#region subscribables/dependendObservable.js
     
-    export type ComputedReadFunction<T> = () => T;
+    export type ComputedReadFunction<T> = Subscribable<T> | Observable<T> | Computed<T> | (() => T);
     export type ComputedWriteFunction<T> = (val: T) => void;
     export type MaybeComputed<T> = T | Computed<T>;
     
