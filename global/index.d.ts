@@ -349,14 +349,15 @@ declare module ko {
     
     export interface IBindingProvider {
         nodeHasBindings(node: Node): boolean;
-        getBindings(node: Node): Object;
-        getBindingAccessors(node: Node): BindingAccessors;
+        getBindings(node: Node, bindingContext: BindingContext<any>): Object;
+        getBindingAccessors(node: Node, bindingContext: BindingContext<any>): BindingAccessors;
     }
     
-    export class bindingProvider {
+    export class bindingProvider implements IBindingProvider {
         nodeHasBindings(node: Node): boolean;
-        getBindings(node: Node): Object;
-        getBindingAccessors(node: Node): BindingAccessors;
+        
+        getBindings(node: Node, bindingContext: BindingContext<any>): Object;
+        getBindingAccessors(node: Node, bindingContext: BindingContext<any>): BindingAccessors;
         
         getBindingsString(node: Node): string;
         getBindingsString(node: Node, bindingContext: BindingContext<any>): string;
@@ -364,7 +365,7 @@ declare module ko {
         parseBindingsString(bindingsString: string, bindingContext: BindingContext<any>, node: Node): Object;
         parseBindingsString(bindingsString: string, bindingContext: BindingContext<any>, node: Node, options: BindingOptions): Object | BindingAccessors;
         
-        static instance: bindingProvider;
+        static instance: IBindingProvider;
     }
     
     //#endregion
@@ -560,56 +561,68 @@ declare module ko {
     export module utils {
         export type MappingFunction<T> = (valueToMap: T, index: number, nodes: Node[]) => Node[];
         export type MappingAfterAddFunction<T> = (arrayEntry: T, nodes: Node[], index: Observable<number>) => Node[];
+        export type MappingHookFunction<T> = (nodes: Node[], index: number, arrayEntry: T) => void;
         
-        export interface MappingOptions {
+        export interface MappingOptions<T> {
             dontLimitMoves?: boolean;
-            beforeMove?: (nodes: Node[]) => void;
-            beforeRemove?: (nodes: Node[]) => void;
-            afterAdd?: (nodes: Node[]) => void;
-            afterMove?: (nodes: Node[]) => void;
-            afterRemove?: (nodes: Node[]) => void;
+            beforeMove?: MappingHookFunction<T>;
+            beforeRemove?: MappingHookFunction<T>;
+            afterAdd?: MappingHookFunction<T>;
+            afterMove?: MappingHookFunction<T>;
+            afterRemove?: MappingHookFunction<T>;
         }
         
         export function setDomNodeChildrenFromArrayMapping<T>(domNode: Node, array: T[], mapping: MappingFunction<T>): void;
-        export function setDomNodeChildrenFromArrayMapping<T>(domNode: Node, array: T[], mapping: MappingFunction<T>, options: MappingOptions): void;
-        export function setDomNodeChildrenFromArrayMapping<T>(domNode: Node, array: T[], mapping: MappingFunction<T>, options: MappingOptions, callbackAfterAddingNodes: MappingAfterAddFunction<T>): void;
+        export function setDomNodeChildrenFromArrayMapping<T>(domNode: Node, array: T[], mapping: MappingFunction<T>, options: MappingOptions<T>): void;
+        export function setDomNodeChildrenFromArrayMapping<T>(domNode: Node, array: T[], mapping: MappingFunction<T>, options: MappingOptions<T>, callbackAfterAddingNodes: MappingAfterAddFunction<T>): void;
     }
     
     //#endregion
     
     //#region templating/templating.js
     
-    export interface TemplateOptions {
+    export interface TemplateOptions<T> {
+        afterRender?: (elements: Node[], dataItem: T) => void;
+        templateEngine?: ko.templateEngine;
+    }
+    
+    export interface TemplateForeachOptions<T> extends TemplateOptions<T[]>, utils.MappingOptions<T> {
+        as?: string;
+        includeDestroyed?: boolean;
+    }
+    
+    export interface BindingTemplateOptions extends TemplateOptions<any>, utils.MappingOptions<any> {
         name?: string | ((val: any) => string);
         nodes?: Node[];
         
+        if?: boolean;
+        ifnot?: boolean;
+       
         data?: any;
         foreach?: any[];
-        if?: boolean;
         
         as?: string;
         includeDestroyed?: boolean;
-        
-        afterRender?: (elements: Node[]) => void;
-        afterAdd?: (elements: Node[]) => void;
-        beforeRemove?: (elements: Node[]) => void;
     }
     
     export interface BindingHandlers {
         template: {
-            init(element: Node, valueAccessor: () => MaybeSubscribable<string | TemplateOptions>): BindingHandlerControlsDescendant;
-            update(element: Node, valueAccessor: () => MaybeSubscribable<string | TemplateOptions>, allBindingsAccessor: AllBindingsAccessor, viewModel: any, bindingContext: BindingContext<any>): void;
+            init(element: Node, valueAccessor: () => MaybeSubscribable<string | BindingTemplateOptions>): BindingHandlerControlsDescendant;
+            update(element: Node, valueAccessor: () => MaybeSubscribable<string | BindingTemplateOptions>, allBindingsAccessor: AllBindingsAccessor, viewModel: any, bindingContext: BindingContext<any>): void;
         };
     }
     export interface VirtualElementsAllowedBindings {
         template: boolean;
     }
     
-    export function renderTemplate(template: string | Node | (() => string | Node), dataOrBindingContext: any | BindingContext<any>, options: TemplateOptions, targetNodeOrNodeArray: Node | Node[]): Computed<void>;
-    export function renderTemplate(template: string | Node | (() => string | Node), dataOrBindingContext: any | BindingContext<any>, options: TemplateOptions, targetNodeOrNodeArray: Node | Node[], renderMode: string): Computed<void>;
-    export function renderTemplate(template: string | Node | (() => string | Node), dataOrBindingContext: any | BindingContext<any>, options: TemplateOptions, targetNodeOrNodeArray: Node | Node[], renderMode: "replaceChildren"): Computed<void>;
-    export function renderTemplate(template: string | Node | (() => string | Node), dataOrBindingContext: any | BindingContext<any>, options: TemplateOptions, targetNodeOrNodeArray: Node | Node[], renderMode: "replaceNode"): Computed<void>;
-    export function renderTemplate(template: string | Node | (() => string | Node), dataOrBindingContext: any | BindingContext<any>, options: TemplateOptions, targetNodeOrNodeArray: Node | Node[], renderMode: "ignoreTargetNode"): Computed<void>;
+    export function renderTemplate(template: string | Node | (() => string | Node)): string;
+    export function renderTemplate<T>(template: string | Node | (() => string | Node), dataOrBindingContext: T | BindingContext<T>): string;
+    export function renderTemplate<T>(template: string | Node | (() => string | Node), dataOrBindingContext: T | BindingContext<T>, options: TemplateOptions<T>): string;
+    export function renderTemplate<T>(template: string | Node | (() => string | Node), dataOrBindingContext: T | BindingContext<T>, options: TemplateOptions<T>, targetNodeOrNodeArray: Node | Node[]): Computed<void>;
+    export function renderTemplate<T>(template: string | Node | (() => string | Node), dataOrBindingContext: T | BindingContext<T>, options: TemplateOptions<T>, targetNodeOrNodeArray: Node | Node[], renderMode: string): Computed<void>;
+    export function renderTemplate<T>(template: string | Node | (() => string | Node), dataOrBindingContext: T | BindingContext<T>, options: TemplateOptions<T>, targetNodeOrNodeArray: Node | Node[], renderMode: "replaceChildren"): Computed<void>;
+    export function renderTemplate<T>(template: string | Node | (() => string | Node), dataOrBindingContext: T | BindingContext<T>, options: TemplateOptions<T>, targetNodeOrNodeArray: Node | Node[], renderMode: "replaceNode"): Computed<void>;
+    export function renderTemplate<T>(template: string | Node | (() => string | Node), dataOrBindingContext: T | BindingContext<T>, options: TemplateOptions<T>, targetNodeOrNodeArray: Node | Node[], renderMode: "ignoreTargetNode"): Computed<void>;
     
     export function setTemplateEngine(templateEngine: templateEngine): void;
     
@@ -620,15 +633,15 @@ declare module ko {
     export abstract class templateEngine {
         allowTemplateRewriting: boolean;
         
-        abstract renderTemplateSource(templateSource: TemplateSource, bindingContext: BindingContext<any>, options: TemplateOptions, templateDocument?: Document): Node[];
+        abstract renderTemplateSource(templateSource: TemplateSource, bindingContext: BindingContext<any>, options: TemplateOptions<any>, templateDocument?: Document): Node[];
         createJavaScriptEvaluatorBlock(script: string): string;
         
-        makeTemplateSource(template: string, templateDocument?: Document): templateSources.domElement;
-        makeTemplateSource(template: Node, templateDocument?: Document): templateSources.anonymousTemplate;
+        makeTemplateSource(template: string | Node, templateDocument?: Document): ko.TemplateSource;
         
-        renderTemplate(template: string | Node, bindingContext: BindingContext<any>, options: TemplateOptions, templateDocument?: Document): Node[];
+        renderTemplate(template: string | Node, bindingContext: BindingContext<any>, options: TemplateOptions<any>, templateDocument?: Document): Node[];
         
         isTemplateRewritten(template: string | Node, templateDocument?: Document): boolean;
+        
         rewriteTemplate(template: string | Node, rewriterCallback: (val: string) => string, templateDocument?: Document): void;
     }
     
@@ -677,7 +690,7 @@ declare module ko {
     //#region templating/native/nativeTemplateEngine.js
     
     export class nativeTemplateEngine extends templateEngine {
-        renderTemplateSource(templateSource: TemplateSource, bindingContext: BindingContext<any>, options: TemplateOptions, templateDocument?: Document): Node[];
+        renderTemplateSource(templateSource: TemplateSource, bindingContext: BindingContext<any>, options: TemplateOptions<any>, templateDocument?: Document): Node[];
         
         static instance: nativeTemplateEngine;
     }
@@ -689,7 +702,7 @@ declare module ko {
     export class jqueryTmplTemplateEngine extends templateEngine {
         jQueryTmplVersion: number;
         
-        renderTemplateSource(templateSource: TemplateSource, bindingContext: BindingContext<any>, options: TemplateOptions, templateDocument?: Document): Node[];
+        renderTemplateSource(templateSource: TemplateSource, bindingContext: BindingContext<any>, options: TemplateOptions<any>, templateDocument?: Document): Node[];
         addTemplate(templateName: string, templateMarkup: string): void;
         
         static instance: nativeTemplateEngine;
@@ -933,7 +946,7 @@ declare module ko {
     //#region utils.domManipulation.js
     
     export module utils {
-        export function parseHtmlFragment(html: string, documentContext: Document): Node[];
+        export function parseHtmlFragment(html: string, documentContext?: Document): Node[];
         export function setHtml(node: Node, html: MaybeSubscribable<string>): void;
     }
 
