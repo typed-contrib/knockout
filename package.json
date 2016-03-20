@@ -1,0 +1,37 @@
+{
+  "name": "typed-knockout",
+  "version": "3.4.0",
+  "description": "Typescript typings definitions for knockout",
+  "author": "typed-contrib",
+  "license": "MIT",
+  "homepage": "https://github.com/typed-contrib/knockout#readme",
+  "main": "index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/typed-contrib/knockout.git"
+  },
+  "bugs": {
+    "url": "https://github.com/typed-contrib/knockout/issues"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "keywords": [
+    "typings",
+    "definitions",
+    "typescript",
+    "knockout",
+    "knockoutjs",
+    "typed-contrib",
+    "typed",
+    "tsd"
+  ],
+  "scripts": {
+    "postinstall": "typings install && cd global && typings install && cd ../test/module && typings install && cd ../global && typings install",
+    "test": "tsc -p test/module && tsc -p test/global"
+  },
+  "devDependencies": {
+    "typescript": "^1.8.9",
+    "typings": "^0.7.9"
+  }
+}

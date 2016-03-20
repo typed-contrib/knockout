@@ -1,6 +1,7 @@
 # Dependencies
 ###################
 typings/
+node_modules/
 
 # Development files
 ###################
