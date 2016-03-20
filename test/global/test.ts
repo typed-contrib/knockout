@@ -462,7 +462,7 @@ function test_more() {
 
 // Define your own functions
 declare module ko {
-    export interface Subscribable<T> {
+    export interface SubscribableFunctions<T> {
         publishOn(topic: string): this;
         subscribeTo(topic: string): this;
     }

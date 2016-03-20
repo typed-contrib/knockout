@@ -18,49 +18,29 @@ declare module ko {
         dispose(): void;
     }
     
-    export interface Subscribable<T> extends Function {
-	    notifySubscribers(): void;
-	    notifySubscribers(valueToWrite: T): void;
-	    notifySubscribers(valueToWrite: T, event: string): void;
-        
-        subscribe(callback: SubscriptionCallback<T>): subscription<T>;
-        subscribe(callback: SubscriptionCallback<T>, callbackTarget: any): subscription<T>;
-        subscribe(callback: SubscriptionCallback<T>, callbackTarget: any, event: string): subscription<T>;
-        
-        extend(requestedExtenders: Object): this;
-        extend<T extends Subscribable<any>>(requestedExtenders: Object): T;
-        
-        getSubscriptionsCount(): number;
-        getSubscriptionsCount(event: string): number;
-    }    
-    
-    export class subscribable<T> implements Subscribable<T> {
+    export interface SubscribableFunctions<T> extends Function {
         notifySubscribers(): void;
-	    notifySubscribers(valueToWrite: T): void;
-	    notifySubscribers(valueToWrite: T, event: string): void;
-        
+        notifySubscribers(valueToWrite: T): void;
+        notifySubscribers(valueToWrite: T, event: string): void;
+
         subscribe(callback: SubscriptionCallback<T>): subscription<T>;
         subscribe(callback: SubscriptionCallback<T>, callbackTarget: any): subscription<T>;
         subscribe(callback: SubscriptionCallback<T>, callbackTarget: any, event: string): subscription<T>;
-        
+
         extend(requestedExtenders: Object): this;
         extend<T extends Subscribable<any>>(requestedExtenders: Object): T;
-        
+
         getSubscriptionsCount(): number;
         getSubscriptionsCount(event: string): number;
-        
-        static fn: Subscribable<any>;
-        
-        // Function methods
-        apply(thisArg: any, argArray?: any): any;
-        call(thisArg: any, ...argArray: any[]): any;
-        bind(thisArg: any, ...argArray: any[]): any;
-        length: number;
-        arguments: any;
-        caller: Function;
-        prototype: any;
     }
+
+    export interface Subscribable<T> extends SubscribableFunctions<T> { }
     
+    export const subscribable: {
+        new <T>(): Subscribable<T>;
+        fn: SubscribableFunctions<any>;
+    };
+
     export function isSubscribable(instance: any): instance is Subscribable<any>;
     export function isSubscribable<T>(instance: any): instance is Subscribable<T>;
     
