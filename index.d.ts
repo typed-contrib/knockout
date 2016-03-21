@@ -638,8 +638,8 @@ declare module ko {
         data<T>(key: string, valueToWrite: T): void;
         
         nodes?: {
-            (): Node[];
-            (valueToWrite: Node[]): void;
+            (): Node;
+            (valueToWrite: Node): void;
         };
     }
     
@@ -656,8 +656,8 @@ declare module ko {
             data<T>(key: string): T;
             data<T>(key: string, valueToWrite: T): void;
             
-            nodes(): Node[];
-            nodes(valueToWrite: Node[]): void;
+            nodes(): Node;
+            nodes(valueToWrite: Node): void;
         }
         
         export class anonymousTemplate extends domElement {
