@@ -760,8 +760,8 @@ declare module ko {
         export interface Loader {
             getConfig(componentName: string, callback: (config: Config) => void): void;
             loadComponent(componentName: string, config: Config, callback: (component: Component) => void): void;
-            loadTemplate(componentName: string, config: ViewModelConfig, callback: (template: Node[]) => void): void;
-            loadViewModel(componentName: string, config: TemplateConfig, callback: (viewModel: any) => void): void;
+            loadTemplate(componentName: string, config: TemplateConfig, callback: (template: Node[]) => void): void;
+            loadViewModel(componentName: string, config: ViewModelConfig, callback: (viewModel: any) => void): void;
         }
         
         export const defaultLoader: Loader;
