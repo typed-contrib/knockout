@@ -1,5 +1,5 @@
 {
-  "name": "typed-knockout",
+  "name": "@types/knockout",
   "version": "3.4.0",
   "description": "Typescript typings definitions for knockout",
   "author": "typed-contrib",
