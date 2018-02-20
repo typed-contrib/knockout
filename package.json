@@ -27,7 +27,7 @@
     "tsd"
   ],
   "scripts": {
-    "postinstall": "typings install && cd global && typings install && cd ../test/module && typings install && cd ../global && typings install",
+    "pretest": "typings install && cd global && typings install && cd ../test/module && typings install && cd ../global && typings install",
     "test": "tsc -p test/module && tsc -p test/global"
   },
   "devDependencies": {
