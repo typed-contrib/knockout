@@ -469,7 +469,7 @@ declare module ko {
             init(element: HTMLElement, valueAccessor: () => MaybeSubscribable<string>, allBindingsAccessor: AllBindingsAccessor): void;
         };
         textinput: {
-            preprocess(value: any, name: string, addBinding: BindingHandlerAddBinding): void;
+            preprocess(value: any, name: string, addBinding?: BindingHandlerAddBinding): void;
         };
         hasfocus: {
             init(element: HTMLElement, valueAccessor: () => MaybeSubscribable<any>, allBindingsAccessor: AllBindingsAccessor): void;
